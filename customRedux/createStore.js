@@ -18,6 +18,14 @@ const createStore = (reducer, preloadedState) => {
 
   // it is used to watch store changes. Listeners are invoked whenever an action is dispatched
   const subscribe = (listener) => {
+    if (typeof listener !== "function") {
+      throw new Error("Store listeners should be of type function");
+    }
+
+    if (isDispatching) {
+      throw new Error("Cannot call store.subscribe while dispatching");
+    }
+
     listeners.push(listener);
 
     return function unsubscribe() {
@@ -32,6 +40,18 @@ const createStore = (reducer, preloadedState) => {
 
   // it is used to trigger store changes, dispatch actions
   const dispatch = (action) => {
+    if (typeof action !== "object") {
+      throw new Error("An action should be a plain object");
+    }
+
+    if (typeof action.type === "undefined") {
+      throw new Error("Action should have a type");
+    }
+
+    if (isDispatching) {
+      throw new Error("Cannot call store.dispatch while dispatching");
+    }
+
     /**
      * { type: 'ADD_VIDEO', payload: {...} }
      *
